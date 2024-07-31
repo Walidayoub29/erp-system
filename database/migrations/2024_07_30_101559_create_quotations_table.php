@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Jenssegers\Mongodb\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 class CreateQuotationsTable extends Migration
@@ -11,9 +11,9 @@ class CreateQuotationsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('quotations', function (Blueprint $table) {
+        Schema::connection('mongodb')->create('quotations', function (Blueprint $table) {
             $table->id();
             $table->string('client_name');
             $table->string('client_email');
@@ -22,6 +22,16 @@ class CreateQuotationsTable extends Migration
             $table->text('description');
             $table->decimal('amount', 10, 2);
             $table->string('status')->default('draft'); // e.g., draft, sent, accepted, rejected
+            $table->string('product_description');
+            $table->integer('quantity');
+            $table->integer('delivered');
+            $table->integer('invoiced');
+            $table->decimal('unit_price', 10, 2);
+            $table->decimal('taxes', 10, 2);
+            $table->decimal('tax_excl', 10, 2);
+            $table->decimal('untaxed_amount', 10, 2);
+            $table->decimal('vat_9', 10, 2);
+            $table->decimal('total', 10, 2);
             $table->timestamps();
         });
     }
@@ -31,8 +41,9 @@ class CreateQuotationsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('quotations');
+        Schema::connection('mongodb')->dropIfExists('quotations');
     }
 }
+

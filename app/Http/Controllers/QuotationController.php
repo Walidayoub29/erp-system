@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Quotation;
+use Illuminate\Http\Request;
 
 class QuotationController extends Controller
 {
@@ -14,45 +14,68 @@ class QuotationController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'client_name' => 'required|string|max:255',
-            'client_email' => 'required|string|email|max:255',
+        $validatedData = $request->validate([
+            'client_name' => 'required|string',
+            'client_email' => 'required|email',
             'quotation_date' => 'required|date',
             'expiration_date' => 'nullable|date',
             'description' => 'required|string',
-            'amount' => 'required|numeric',
-            'status' => 'required|string|in:draft,sent,accepted,rejected',
+            'product_description' => 'required|string',
+            'quantity' => 'required|integer',
+            'delivered' => 'required|integer',
+            'invoiced' => 'required|integer',
+            'unit_price' => 'required|numeric',
+            'taxes' => 'required|numeric',
+            'tax_excl' => 'required|numeric',
+            'untaxed_amount' => 'required|numeric',
+            'vat_9' => 'required|numeric',
+            'total' => 'required|numeric',
+            'status' => 'string|in:draft,sent,accepted,rejected',
         ]);
 
-        $quotation = Quotation::create($request->all());
+        $quotation = Quotation::create($validatedData);
         return response()->json($quotation, 201);
     }
 
     public function show($id)
     {
-        return Quotation::findOrFail($id);
+        $quotation = Quotation::find($id);
+        if (!$quotation) {
+            return response()->json(['message' => 'Quotation not found'], 404);
+        }
+        return response()->json($quotation);
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'client_name' => 'string|max:255',
-            'client_email' => 'string|email|max:255',
-            'quotation_date' => 'date',
+        $validatedData = $request->validate([
+            'client_name' => 'required|string',
+            'client_email' => 'required|email',
+            'quotation_date' => 'required|date',
             'expiration_date' => 'nullable|date',
-            'description' => 'string',
-            'amount' => 'numeric',
+            'description' => 'required|string',
+            'product_description' => 'required|string',
+            'quantity' => 'required|integer',
+            'delivered' => 'required|integer',
+            'invoiced' => 'required|integer',
+            'unit_price' => 'required|numeric',
+            'taxes' => 'required|numeric',
+            'tax_excl' => 'required|numeric',
+            'untaxed_amount' => 'required|numeric',
+            'vat_9' => 'required|numeric',
+            'total' => 'required|numeric',
             'status' => 'string|in:draft,sent,accepted,rejected',
         ]);
 
         $quotation = Quotation::findOrFail($id);
-        $quotation->update($request->all());
+        $quotation->update($validatedData);
         return response()->json($quotation, 200);
     }
 
     public function destroy($id)
     {
-        Quotation::findOrFail($id)->delete();
+        $quotation = Quotation::findOrFail($id);
+        $quotation->delete();
         return response()->json(null, 204);
     }
 }
